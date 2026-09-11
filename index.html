@@ -35,7 +35,7 @@ const picker=el('picker');
 for(const j of jokes){const o=document.createElement('option');o.value=j.number;o.textContent=`#${String(j.number).padStart(2,'0')} ${j.title}`;picker.append(o);}
 function choose(){const index=jokes.findIndex(j=>j.number===Number(picker.value));const j=jokes[index];el('previous').disabled=index===0;el('next').disabled=index===jokes.length-1;video.pause();video.querySelector('source').src=j.video;video.setAttribute('aria-label',j.title);video.load();el('error').hidden=true;el('celebrate').hidden=true;el('explanation').hidden=true;el('question').hidden=true;el('waiting').hidden=false;el('explanation').replaceChildren();const h=document.createElement('h2');h.textContent='💡 '+j.title;const q=document.createElement('blockquote');q.textContent=j.setup+' '+j.punchline;const p=document.createElement('p');p.textContent=j.explanation;el('explanation').append(h,q,p);history.replaceState(null,'','#joke-'+j.number);}
 picker.addEventListener('change',choose);
-function move(delta){const index=jokes.findIndex(j=>j.number===Number(picker.value));const target=jokes[index+delta];if(!target)return;picker.value=String(target.number);choose();}
+function move(delta){const index=jokes.findIndex(j=>j.number===Number(picker.value));const target=jokes[index+delta];if(!target)return;picker.value=String(target.number);choose();video.play().catch(()=>{});}
 el('previous').addEventListener('click',()=>move(-1));
 el('next').addEventListener('click',()=>move(1));
 el('direct').addEventListener('click',()=>{el('celebrate').hidden=true;el('explanation').hidden=false;});
