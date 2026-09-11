@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ENGLISH JOKES 1000 — Did you get the joke?</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#10142c;color:#fff;font-family:Arial,'Yu Gothic',sans-serif}main{max-width:960px;margin:auto;padding:24px}header{color:#66e4d0;font-weight:bold;letter-spacing:2px;margin-bottom:20px}.layout{display:grid;grid-template-columns:minmax(240px,360px) 1fr;gap:28px;align-items:center}video{display:block;width:100%;max-height:78vh;border-radius:18px;background:#000}section{background:#1d2440;padding:28px;border-radius:20px}h1{font-size:30px;line-height:1.2}p{line-height:1.8;color:#d5dded}.buttons{display:flex;gap:12px;flex-wrap:wrap}button{font:inherit;font-weight:bold;border:0;border-radius:12px;padding:16px 25px;cursor:pointer;min-height:48px}button:focus-visible{outline:3px solid white;outline-offset:4px}#yes{background:#66e4d0;color:#10142c}#no{background:#ffc76b;color:#10142c}.secondary{background:#35415f;color:white;margin-top:18px}.answer{border-top:1px solid #46516b;margin-top:24px;padding-top:12px}.answer h2{color:#ffc76b}blockquote{margin:16px 0;padding-left:16px;border-left:3px solid #66e4d0;line-height:1.8}.confetti{position:fixed;top:-30px;width:10px;height:17px;pointer-events:none;animation:fall 2.5s ease-in forwards;z-index:10}@keyframes fall{to{transform:translateY(110vh) rotate(650deg)}}[hidden]{display:none!important}@media(max-width:650px){main{padding:16px}.layout{grid-template-columns:1fr;gap:16px}video{max-height:58vh}section{padding:22px}h1{font-size:26px}}@media(prefers-reduced-motion:reduce){.confetti{display:none}}
+</style>
+<main>
+<header>ENGLISH JOKES 1000</header>
+<div class="layout">
+<video id="video" controls playsinline preload="metadata" aria-label="反重力の本についての英語ジョーク"><source src="joke.mp4" type="video/mp4">MP4動画を再生できるブラウザで開いてください。</video>
+<section>
+<div id="waiting"><h1>A little English.<br>A little laugh.</h1><p>動画を再生してください。最後に Yes / No ボタンが表示されます。</p></div>
+<div id="question" hidden><h1>Did you get the joke?</h1><p>ジョークの意味は分かりましたか？</p><div class="buttons"><button id="yes" type="button">Yes 🎉</button><button id="no" type="button">No 💡</button></div></div>
+<div id="result" role="status" aria-live="polite" aria-atomic="true">
+<div id="celebrate" class="answer" hidden><h2>You got it! 🎉</h2><p>その調子！ 英語の言葉遊びを楽しめましたね。</p></div>
+<div id="explanation" class="answer" hidden><h2>💡 ジョークの解説</h2><blockquote>I'm reading a book about anti-gravity...<br>It's impossible to put down!</blockquote><p>「反重力についての本を読んでいるんだ。どうしても手放せないよ！」</p><p><strong>put down</strong> は「置く」という意味です。本について <strong>impossible to put down</strong> と言うと、「面白くて読むのをやめられない」という意味になります。</p><p>ここでは <strong>anti-gravity（反重力）</strong> の本なので、「重力に逆らって浮いてしまい、下に置けない」という意味も重ねています。この二重の意味がオチです。</p></div>
+</div>
+<button id="replay" class="secondary" type="button" hidden>↻ もう一度見る</button>
+<p id="error" hidden>動画を読み込めませんでした。ZIPをすべて展開して、index.html と joke.mp4 を同じフォルダーに置いてください。</p>
+</section></div></main>
+<script>
+const video=document.getElementById('video');
+const el=id=>document.getElementById(id);
+function sync(){const ready=video.currentTime>=7.1||video.ended;el('question').hidden=!ready;el('waiting').hidden=ready;el('replay').hidden=!ready;if(!ready){el('celebrate').hidden=true;el('explanation').hidden=true;}}
+video.addEventListener('timeupdate',sync);video.addEventListener('seeked',sync);video.addEventListener('ended',sync);
+video.addEventListener('error',()=>el('error').hidden=false);video.querySelector('source').addEventListener('error',()=>el('error').hidden=false);
+el('yes').addEventListener('click',()=>{el('celebrate').hidden=false;el('explanation').hidden=true;document.querySelectorAll('.confetti').forEach(n=>n.remove());if(!matchMedia('(prefers-reduced-motion: reduce)').matches){for(let i=0;i<48;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#66e4d0','#ffc76b','#c4adff'][i%3];c.style.animationDelay=Math.random()*.5+'s';document.body.append(c);setTimeout(()=>c.remove(),3200);}}});
+el('no').addEventListener('click',()=>{el('celebrate').hidden=true;el('explanation').hidden=false;});
+el('replay').addEventListener('click',()=>{video.currentTime=0;sync();video.play().catch(()=>{});});
+</script>
+</html>
