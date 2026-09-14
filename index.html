@@ -16,7 +16,7 @@
 </nav><div class="layout">
 <video id="video" controls playsinline preload="metadata" aria-label="反重力の本についての英語ジョーク"><source src="joke.mp4" type="video/mp4">MP4動画を再生できるブラウザで開いてください。</video>
 <section>
-<p id="autostatus" role="status"></p>
+
 
 <div id="result" role="status" aria-live="polite" aria-atomic="true">
 
@@ -30,9 +30,9 @@ const jokes=[{"number": 1, "title": "Anti-gravity", "category": "Dad Jokes & Pun
 const el=id=>document.getElementById(id),video=el('video');
 let current=jokes[0],filtered=[...jokes],page=0;const size=20;
 let automatic=false,timer=null,switching=false;const explanationDelay=8000;
-function clearAdvance(){clearTimeout(timer);timer=null;el('autostatus').textContent='';}
+function clearAdvance(){clearTimeout(timer);timer=null;}
 function setAutomatic(value){automatic=value;el('replay').textContent=value?'停止':'自動再生';el('replay').setAttribute('aria-pressed',String(value));if(!value)clearAdvance();}
-function ended(){el('explanation').hidden=false;clearAdvance();if(!automatic)return;if(jokes.indexOf(current)===jokes.length-1){setAutomatic(false);el('autostatus').textContent='最後の動画まで再生しました。';return;}el('autostatus').textContent='8秒後に次の動画へ進みます。解説を読み続ける場合は「停止」を押してください。';timer=setTimeout(()=>{timer=null;if(automatic)move(1);},explanationDelay);}
+function ended(){el('explanation').hidden=false;clearAdvance();if(!automatic)return;if(jokes.indexOf(current)===jokes.length-1){setAutomatic(false);return;}timer=setTimeout(()=>{timer=null;if(automatic)move(1);},explanationDelay);}
 for(const name of new Set(jokes.map(j=>j.category))){const o=document.createElement('option');o.value=name;o.textContent=name;el('category').append(o);}
 function list(){const start=page*size;el('picker').replaceChildren();for(const j of filtered.slice(start,start+size)){const o=document.createElement('option');o.value=j.number;o.textContent=`#${String(j.number).padStart(3,'0')} ${j.title}`;el('picker').append(o);}if(!filtered.slice(start,start+size).some(j=>j.number===current.number)){const o=document.createElement('option');o.value='';o.textContent='この一覧から動画を選択';o.disabled=true;el('picker').prepend(o);}el('picker').value=filtered.slice(start,start+size).some(j=>j.number===current.number)?String(current.number):'';el('picker').disabled=!filtered.length;el('count').textContent=filtered.length?`${start+1}〜${Math.min(start+size,filtered.length)} / ${filtered.length}本`:'該当する動画はありません';el('pageback').disabled=page===0;el('pageforward').disabled=(page+1)*size>=filtered.length;}
 function filter(){const q=el('search').value.trim().toLowerCase().replace(/^#/,''),cat=el('category').value;filtered=jokes.filter(j=>(!cat||j.category===cat)&&(!q||(/^\d+$/.test(q)?j.number===Number(q):[j.title,j.setup,j.punchline,j.explanation].join(' ').toLowerCase().includes(q))));page=0;list();}
@@ -46,7 +46,7 @@ el('search').oninput=filter;el('category').onchange=filter;
 el('pageback').onclick=()=>{page--;list();};el('pageforward').onclick=()=>{page++;list();};
 video.addEventListener('ended',ended);
 video.addEventListener('pause',()=>{if(!switching&&video.paused&&!video.ended&&automatic)setAutomatic(false);});
-video.addEventListener('play',()=>{clearAdvance();el('explanation').hidden=true;});
+video.addEventListener('play',()=>{clearAdvance();el('explanation').hidden=false;});
 function mediaError(){setAutomatic(false);el('error').hidden=false;}
 video.addEventListener('error',mediaError);video.querySelector('source').addEventListener('error',mediaError);
 function fromHash(){setAutomatic(false);const n=Number(location.hash.replace('#joke-',''));const j=jokes.find(j=>j.number===n)||jokes[0];el('search').value='';el('category').value='';filtered=[...jokes];page=Math.floor(jokes.indexOf(j)/size);list();choose(j.number);}
