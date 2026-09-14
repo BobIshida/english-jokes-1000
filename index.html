@@ -17,9 +17,9 @@
 <video id="video" controls playsinline preload="metadata" aria-label="反重力の本についての英語ジョーク"><source src="joke.mp4" type="video/mp4">MP4動画を再生できるブラウザで開いてください。</video>
 <section>
 <p id="autostatus" role="status"></p>
-<div id="question" hidden><h1>Did you get the joke?</h1><p>ジョークの意味は分かりましたか？</p><div class="buttons"><button id="yes" type="button">Yes 🎉</button><button id="no" type="button">No 💡</button></div></div>
+
 <div id="result" role="status" aria-live="polite" aria-atomic="true">
-<div id="celebrate" class="answer" hidden><h2>You got it! 🎉</h2><p>その調子！ 英語の言葉遊びを楽しめましたね。</p></div>
+
 <div id="explanation" class="answer" hidden><h2>💡 ジョークの解説</h2><blockquote>I'm reading a book about anti-gravity...<br>It's impossible to put down!</blockquote><p>「反重力についての本を読んでいるんだ。どうしても手放せないよ！」</p><p><strong>put down</strong> は「置く」という意味です。本について <strong>impossible to put down</strong> と言うと、「面白くて読むのをやめられない」という意味になります。</p><p>ここでは <strong>anti-gravity（反重力）</strong> の本なので、「重力に逆らって浮いてしまい、下に置けない」という意味も重ねています。この二重の意味がオチです。</p></div>
 </div>
 <div class="playback-nav"><button id="previous" class="secondary" type="button">戻る</button><button id="replay" class="secondary" type="button" aria-pressed="false">自動再生</button><button id="next" class="secondary" type="button">進む</button></div><p id="now" aria-live="polite"></p>
@@ -32,25 +32,21 @@ let current=jokes[0],filtered=[...jokes],page=0;const size=20;
 let automatic=false,timer=null,switching=false;const explanationDelay=8000;
 function clearAdvance(){clearTimeout(timer);timer=null;el('autostatus').textContent='';}
 function setAutomatic(value){automatic=value;el('replay').textContent=value?'停止':'自動再生';el('replay').setAttribute('aria-pressed',String(value));if(!value)clearAdvance();}
-function ended(){el('celebrate').hidden=true;el('explanation').hidden=false;clearAdvance();if(!automatic)return;if(jokes.indexOf(current)===jokes.length-1){setAutomatic(false);el('autostatus').textContent='最後の動画まで再生しました。';return;}el('autostatus').textContent='8秒後に次の動画へ進みます。解説を読み続ける場合は「停止」を押してください。';timer=setTimeout(()=>{timer=null;if(automatic)move(1);},explanationDelay);}
+function ended(){el('explanation').hidden=false;clearAdvance();if(!automatic)return;if(jokes.indexOf(current)===jokes.length-1){setAutomatic(false);el('autostatus').textContent='最後の動画まで再生しました。';return;}el('autostatus').textContent='8秒後に次の動画へ進みます。解説を読み続ける場合は「停止」を押してください。';timer=setTimeout(()=>{timer=null;if(automatic)move(1);},explanationDelay);}
 for(const name of new Set(jokes.map(j=>j.category))){const o=document.createElement('option');o.value=name;o.textContent=name;el('category').append(o);}
 function list(){const start=page*size;el('picker').replaceChildren();for(const j of filtered.slice(start,start+size)){const o=document.createElement('option');o.value=j.number;o.textContent=`#${String(j.number).padStart(3,'0')} ${j.title}`;el('picker').append(o);}if(!filtered.slice(start,start+size).some(j=>j.number===current.number)){const o=document.createElement('option');o.value='';o.textContent='この一覧から動画を選択';o.disabled=true;el('picker').prepend(o);}el('picker').value=filtered.slice(start,start+size).some(j=>j.number===current.number)?String(current.number):'';el('picker').disabled=!filtered.length;el('count').textContent=filtered.length?`${start+1}〜${Math.min(start+size,filtered.length)} / ${filtered.length}本`:'該当する動画はありません';el('pageback').disabled=page===0;el('pageforward').disabled=(page+1)*size>=filtered.length;}
 function filter(){const q=el('search').value.trim().toLowerCase().replace(/^#/,''),cat=el('category').value;filtered=jokes.filter(j=>(!cat||j.category===cat)&&(!q||(/^\d+$/.test(q)?j.number===Number(q):[j.title,j.setup,j.punchline,j.explanation].join(' ').toLowerCase().includes(q))));page=0;list();}
-function sync(){const ready=Number.isFinite(video.duration)&&(video.currentTime>=video.duration-4.5||video.ended);el('question').hidden=!ready;}
 function play(){video.play().catch(()=>{setAutomatic(false);el('now').textContent=`#${String(current.number).padStart(3,'0')} ${current.title} — 動画の再生ボタン、または「自動再生」を押してください`;});}
-function choose(n,autoplay=false){const j=jokes.find(j=>j.number===n);if(!j)return;clearAdvance();current=j;switching=true;video.pause();video.querySelector('source').src=j.video;video.setAttribute('aria-label',j.title);video.load();switching=false;for(const id of ['error','celebrate','explanation','question'])el(id).hidden=true;document.querySelectorAll('.confetti').forEach(e=>e.remove());el('explanation').replaceChildren();const h=document.createElement('h2');h.textContent='💡 '+j.title;const q=document.createElement('blockquote');q.textContent=j.setup+' '+j.punchline;const p=document.createElement('p');p.textContent=j.explanation;el('explanation').append(h,q,p);const index=jokes.indexOf(j);el('previous').disabled=index===0;el('next').disabled=index===jokes.length-1;el('now').textContent=`#${String(j.number).padStart(3,'0')} ${j.title}`;history.replaceState(null,'','#joke-'+j.number);el('picker').value=String(j.number);if(autoplay)play();}
+function choose(n,autoplay=false){const j=jokes.find(j=>j.number===n);if(!j)return;clearAdvance();current=j;switching=true;video.pause();video.querySelector('source').src=j.video;video.setAttribute('aria-label',j.title);video.load();switching=false;for(const id of ['error','explanation'])el(id).hidden=true;el('explanation').replaceChildren();const h=document.createElement('h2');h.textContent='💡 '+j.title;const q=document.createElement('blockquote');q.textContent=j.setup+' '+j.punchline;const p=document.createElement('p');p.textContent=j.explanation;el('explanation').append(h,q,p);const index=jokes.indexOf(j);el('previous').disabled=index===0;el('next').disabled=index===jokes.length-1;el('now').textContent=`#${String(j.number).padStart(3,'0')} ${j.title}`;history.replaceState(null,'','#joke-'+j.number);el('picker').value=String(j.number);if(autoplay)play();}
 function move(delta){const j=jokes[jokes.indexOf(current)+delta];if(!j)return;el('search').value='';el('category').value='';filtered=[...jokes];page=Math.floor(jokes.indexOf(j)/size);list();choose(j.number,true);}
 el('previous').onclick=()=>move(-1);el('next').onclick=()=>move(1);
-el('replay').onclick=()=>{if(automatic){setAutomatic(false);video.pause();return;}setAutomatic(true);if(video.ended){video.currentTime=0;el('explanation').hidden=true;el('celebrate').hidden=true;}sync();play();};
+el('replay').onclick=()=>{if(automatic){setAutomatic(false);video.pause();return;}setAutomatic(true);if(video.ended){video.currentTime=0;el('explanation').hidden=true;}play();};
 el('picker').onchange=()=>choose(Number(el('picker').value),true);
 el('search').oninput=filter;el('category').onchange=filter;
 el('pageback').onclick=()=>{page--;list();};el('pageforward').onclick=()=>{page++;list();};
-el('no').onclick=()=>{el('celebrate').hidden=true;el('explanation').hidden=false;};
-el('yes').onclick=()=>{el('celebrate').hidden=false;el('explanation').hidden=!video.ended;document.querySelectorAll('.confetti').forEach(n=>n.remove());if(!matchMedia('(prefers-reduced-motion: reduce)').matches)for(let i=0;i<48;i++){const c=document.createElement('i');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.background=['#66e4d0','#ffc76b','#c4adff'][i%3];c.style.animationDelay=Math.random()*.5+'s';document.body.append(c);setTimeout(()=>c.remove(),3200);}};
-for(const event of ['timeupdate','seeked','ended'])video.addEventListener(event,sync);
 video.addEventListener('ended',ended);
 video.addEventListener('pause',()=>{if(!switching&&video.paused&&!video.ended&&automatic)setAutomatic(false);});
-video.addEventListener('play',()=>{clearAdvance();el('explanation').hidden=true;el('celebrate').hidden=true;});
+video.addEventListener('play',()=>{clearAdvance();el('explanation').hidden=true;});
 function mediaError(){setAutomatic(false);el('error').hidden=false;}
 video.addEventListener('error',mediaError);video.querySelector('source').addEventListener('error',mediaError);
 function fromHash(){setAutomatic(false);const n=Number(location.hash.replace('#joke-',''));const j=jokes.find(j=>j.number===n)||jokes[0];el('search').value='';el('category').value='';filtered=[...jokes];page=Math.floor(jokes.indexOf(j)/size);list();choose(j.number);}
