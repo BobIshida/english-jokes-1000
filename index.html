@@ -22,7 +22,7 @@
 
 <div id="explanation" class="answer" hidden><h2>💡 ジョークの解説</h2><blockquote>I'm reading a book about anti-gravity...<br>It's impossible to put down!</blockquote><p>「反重力についての本を読んでいるんだ。どうしても手放せないよ！」</p><p><strong>put down</strong> は「置く」という意味です。本について <strong>impossible to put down</strong> と言うと、「面白くて読むのをやめられない」という意味になります。</p><p>ここでは <strong>anti-gravity（反重力）</strong> の本なので、「重力に逆らって浮いてしまい、下に置けない」という意味も重ねています。この二重の意味がオチです。</p></div>
 </div>
-<div class="playback-nav"><button id="previous" class="secondary" type="button">戻る</button><button id="replay" class="secondary" type="button" aria-pressed="false">自動再生</button><button id="next" class="secondary" type="button">進む</button></div><p id="now" aria-live="polite"></p>
+<div class="playback-nav"><button id="previous" class="secondary" type="button" aria-label="戻る" title="戻る">⏮</button><button id="replay" class="secondary" type="button" aria-pressed="false" aria-label="自動再生" title="自動再生">▶</button><button id="next" class="secondary" type="button" aria-label="進む" title="進む">⏭</button></div><p id="now" aria-live="polite"></p>
 <p id="error" hidden>動画を読み込めませんでした。通信状態を確認し、ページを再読み込みしてください。</p>
 </section></div></main>
 <script>
@@ -31,7 +31,7 @@ const el=id=>document.getElementById(id),video=el('video');
 let current=jokes[0],filtered=[...jokes],page=0;const size=20;
 let automatic=false,timer=null,switching=false;const explanationDelay=8000;
 function clearAdvance(){clearTimeout(timer);timer=null;}
-function setAutomatic(value){automatic=value;el('replay').textContent=value?'停止':'自動再生';el('replay').setAttribute('aria-pressed',String(value));if(!value)clearAdvance();}
+function setAutomatic(value){automatic=value;el('replay').textContent=value?'⏹':'▶';el('replay').setAttribute('aria-label',value?'停止':'自動再生');el('replay').title=value?'停止':'自動再生';el('replay').setAttribute('aria-pressed',String(value));if(!value)clearAdvance();}
 function ended(){el('explanation').hidden=false;clearAdvance();if(!automatic)return;if(jokes.indexOf(current)===jokes.length-1){setAutomatic(false);return;}timer=setTimeout(()=>{timer=null;if(automatic)move(1);},explanationDelay);}
 for(const name of new Set(jokes.map(j=>j.category))){const o=document.createElement('option');o.value=name;o.textContent=name;el('category').append(o);}
 function list(){const start=page*size;el('picker').replaceChildren();for(const j of filtered.slice(start,start+size)){const o=document.createElement('option');o.value=j.number;o.textContent=`#${String(j.number).padStart(3,'0')} ${j.title}`;el('picker').append(o);}if(!filtered.slice(start,start+size).some(j=>j.number===current.number)){const o=document.createElement('option');o.value='';o.textContent='この一覧から動画を選択';o.disabled=true;el('picker').prepend(o);}el('picker').value=filtered.slice(start,start+size).some(j=>j.number===current.number)?String(current.number):'';el('picker').disabled=!filtered.length;el('count').textContent=filtered.length?`${start+1}〜${Math.min(start+size,filtered.length)} / ${filtered.length}本`:'該当する動画はありません';el('pageback').disabled=page===0;el('pageforward').disabled=(page+1)*size>=filtered.length;}
